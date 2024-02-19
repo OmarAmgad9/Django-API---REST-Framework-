@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
-
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAuthorOrReadOnly
+from .models import Post
+from .serializers import PostSerializer
 # Create your views here.
 
 
@@ -87,6 +90,7 @@ def FBV_pk(request, pk):
 from rest_framework.views import APIView
 #4.1 List == GET and Create == Post
 class CVB_List(APIView):
+    authentication_classes = [TokenAuthentication]
     def get(self, request):
         guests = Guest.objects.all()
         serializer = GuestSerializer(guests, many=True)
@@ -97,7 +101,6 @@ class CVB_List(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
         return Response(serializer.data,status=status.HTTP_400_BAD_REQUEST)
 #4.2 GET With key or put or delete
 from django.http import Http404
@@ -148,14 +151,20 @@ class Mixins_pk(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Destr
         return self.destroy(request)
 #6 Generics
     #6.1 
+
 class Generics_list(generics.ListCreateAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestSerializer
+    authentication_classes = [TokenAuthentication]
+    # authentication_classes = [BasicAuthentication]
+    # permission_classes = [IsAuthenticated]
+
 
     #6.2
 class Generics_pk(generics.RetrieveUpdateDestroyAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestSerializer
+    # authentication_classes = [TokenAuthentication]
 
 #7 ViewSets
 class ViweSets_guest(viewsets.ModelViewSet):
@@ -194,3 +203,8 @@ def new_reservation(request):
 
 #9 Create New Reservation
 
+#10 Post Author Editor
+class Post_pk(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthorOrReadOnly]
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer

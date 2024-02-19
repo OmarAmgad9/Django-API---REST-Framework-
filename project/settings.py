@@ -38,11 +38,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'app',
     
 ]
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = { # This Apply In all View
+                    # Basic authencation You Want add password and username if you Want access the url
+    # 'DEFAULT_AUTHENTICATION_CLASSES':
+    # ['rest_framework.authentication.BasicAuthentication'],
+    # 'DEFAULT_AUTHENTICATION_CLASSES':
+    # ['rest_framework.authentication.TokenAuthentication'],
+    # 'DEFAULT_PERMISSION_CLASSES':
+    # ['rest_framework.permissions.IsAuthenticated'],
+}
+
+# AllowAny \\ IsAuthenticated \\ IsAdmin \\ IsAuthenticatedReadOnly
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
